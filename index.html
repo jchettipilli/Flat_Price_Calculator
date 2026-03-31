@@ -16,12 +16,17 @@
   .section-label:first-child { margin-top: 0; }
   .field { display: grid; grid-template-columns: 1fr 140px; gap: 10px; align-items: center; margin-bottom: 8px; }
   .field label { font-size: 13px; color: #444; }
-  .field input { width: 100%; padding: 7px 10px; font-size: 14px; border: 1.5px solid #cdd8e3; border-radius: 6px; color: #0000cc; font-weight: 600; background: #EBF5FB; outline: none; text-align: right; }
-  .field input:focus { border-color: #1F3864; }
+  .field input, .field select { width: 100%; padding: 7px 10px; font-size: 14px; border: 1.5px solid #cdd8e3; border-radius: 6px; color: #0000cc; font-weight: 600; background: #EBF5FB; outline: none; text-align: right; }
+  .field select { text-align: left; cursor: pointer; }
+  .field input:focus, .field select:focus { border-color: #1F3864; }
   .field-3 { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; margin-bottom: 8px; }
   .field-3 label { font-size: 13px; color: #444; }
   .field-3 .fixed { font-size: 12px; color: #888; white-space: nowrap; }
   .preview { font-size: 13px; font-weight: 600; color: #1F3864; text-align: right; white-space: nowrap; }
+  .info-box { font-size: 12px; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; line-height: 1.6; }
+  .info-box.block8 { background: #FEF3E2; color: #92400E; border: 1px solid #FCD34D; }
+  .info-box.other  { background: #EBF5FB; color: #1F3864; border: 1px solid #cdd8e3; }
+  .info-box.small  { background: #F0FDF4; color: #166534; border: 1px solid #86EFAC; }
   .divider { border: none; border-top: 1px solid #e8ecf0; margin: 20px 0; }
   .breakdown { border: 1px solid #e0e6ed; border-radius: 8px; overflow: hidden; margin-top: 4px; }
   .brow { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 10px 14px; border-bottom: 1px solid #e8ecf0; }
@@ -51,25 +56,36 @@
 
     <div class="section-label">Flat Details</div>
     <div class="field">
+      <label>Block number</label>
+      <select id="block" onchange="calc()">
+        <option value="">— select —</option>
+        <option value="1">Block 1</option>
+        <option value="2">Block 2</option>
+        <option value="3">Block 3</option>
+        <option value="4">Block 4</option>
+        <option value="5">Block 5</option>
+        <option value="6">Block 6</option>
+        <option value="7">Block 7</option>
+        <option value="8">Block 8</option>
+      </select>
+    </div>
+    <div class="field">
       <label>Area (sqft)</label>
-      <input type="number" id="sqft" value="2336" min="0" oninput="calc()">
+      <input type="number" id="sqft" value="" min="0" oninput="calc()">
     </div>
 
     <div class="section-label">Price per sqft <span class="badge">varies per buyer</span></div>
     <div class="field">
-      <label>Base price (₹/sqft)</label>
-      <input type="number" id="basePrice" value="5500" min="0" oninput="calc()">
+      <label>Reg price (₹/sqft)</label>
+      <input type="number" id="basePrice" value="" min="0" oninput="calc()">
     </div>
     <div class="field">
       <label>Other price (₹/sqft)</label>
       <input type="number" id="otherPrice" value="0" min="0" oninput="calc()">
     </div>
 
-    <div class="section-label">Car Parking <span class="badge">fixed — 2 slots = ₹5,00,000</span></div>
-    <div class="field">
-      <label>Number of parkings</label>
-      <input type="number" id="parkings" value="2" min="0" max="10" oninput="calc()">
-    </div>
+    <div class="section-label">Car Parking <span class="badge">fixed</span></div>
+    <div class="info-box other" id="park_info">Select a block and enter sqft to see parking details</div>
 
     <div class="section-label">Corpus & Maintenance <span class="badge">based on sqft</span></div>
     <div class="field-3">
@@ -87,30 +103,30 @@
     <div class="section-label">Breakdown</div>
     <div class="breakdown">
       <div class="brow">
-        <div><div class="blabel">Base price</div><div class="bfm">base rate × sqft</div></div>
-        <span class="bval" id="b_base"></span>
+        <div><div class="blabel">Reg price</div><div class="bfm">reg rate × sqft</div></div>
+        <span class="bval" id="b_base">—</span>
       </div>
       <div class="brow">
         <div><div class="blabel">Other price</div><div class="bfm">other rate × sqft</div></div>
-        <span class="bval" id="b_other"></span>
+        <span class="bval" id="b_other">—</span>
       </div>
       <div class="brow">
-        <div><div class="blabel">Car parking</div><div class="bfm" id="b_park_fm"></div></div>
-        <span class="bval" id="b_park"></span>
+        <div><div class="blabel">Car parking</div><div class="bfm" id="b_park_fm">—</div></div>
+        <span class="bval" id="b_park">—</span>
       </div>
       <div class="brow">
         <div><div class="blabel">Corpus fund</div><div class="bfm">₹50 × sqft × 1.18</div></div>
-        <span class="bval" id="b_corpus"></span>
+        <span class="bval" id="b_corpus">—</span>
       </div>
       <div class="brow">
         <div><div class="blabel">Advance maintenance</div><div class="bfm">₹2.5 × sqft × 24 months</div></div>
-        <span class="bval" id="b_maint"></span>
+        <span class="bval" id="b_maint">—</span>
       </div>
     </div>
 
     <div class="total-box">
       <span class="tlabel">Total</span>
-      <span class="tval" id="total"></span>
+      <span class="tval" id="total">—</span>
     </div>
 
     <div class="cash-box">
@@ -121,7 +137,7 @@
       <span class="cval">₹51,000</span>
     </div>
 
-    <p class="note">* Car parking: 2 slots = ₹5,00,000 fixed (₹2.5L per slot). Corpus GST @ 18% included. Debris & other charges ₹51,000 cash payable at possession.</p>
+    <p class="note">* Parking: Block 8 → 3 slots @ ₹7L | ≤1497 sqft → 1 slot @ ₹4L | All others → 2 slots @ ₹5L. Corpus GST @ 18% included. Debris ₹51,000 cash at possession.</p>
   </div>
 </div>
 
@@ -130,31 +146,51 @@ function fmt(n) {
   return '₹' + Math.round(n).toLocaleString('en-IN');
 }
 function calc() {
-  const bp = parseFloat(document.getElementById('basePrice').value) || 0;
-  const op = parseFloat(document.getElementById('otherPrice').value) || 0;
-  const sf = parseFloat(document.getElementById('sqft').value) || 0;
-  const pk = parseFloat(document.getElementById('parkings').value) || 0;
+  const bp    = parseFloat(document.getElementById('basePrice').value) || 0;
+  const op    = parseFloat(document.getElementById('otherPrice').value) || 0;
+  const sf    = parseFloat(document.getElementById('sqft').value) || 0;
+  const block = document.getElementById('block').value;
+
+  let slots, parkTotal, parkClass, parkInfoText;
+
+  if (!block || !sf) {
+    slots = null; parkTotal = 0;
+    parkInfoText = 'Select a block and enter sqft to see parking details';
+    parkClass = 'info-box other';
+  } else if (block === '8') {
+    slots = 3; parkTotal = 700000;
+    parkInfoText = 'Block 8 — 3 car parkings @ ₹7,00,000 (fixed)';
+    parkClass = 'info-box block8';
+  } else if (sf <= 1497) {
+    slots = 1; parkTotal = 400000;
+    parkInfoText = '≤1497 sqft — 1 car parking @ ₹4,00,000 (fixed)';
+    parkClass = 'info-box small';
+  } else {
+    slots = 2; parkTotal = 500000;
+    parkInfoText = 'Blocks 1–7 — 2 car parkings @ ₹5,00,000 (fixed)';
+    parkClass = 'info-box other';
+  }
 
   const baseCost   = Math.round(bp * sf);
   const otherCost  = Math.round(op * sf);
-  const parkCost   = Math.round(pk * 250000);
   const corpusCost = Math.round(50 * sf * 1.18);
   const maintCost  = Math.round(2.5 * sf * 24);
-  const total      = baseCost + otherCost + parkCost + corpusCost + maintCost;
+  const ready      = block && sf;
+  const total      = ready ? baseCost + otherCost + parkTotal + corpusCost + maintCost : 0;
 
-  const parkFm = pk === 2 ? '2 slots = ₹5,00,000 (fixed)'
-               : pk === 1 ? '1 slot = ₹2,50,000'
-               : pk + ' slots × ₹2.5L each';
+  const parkFm = slots ? `${slots} slot${slots > 1 ? 's' : ''} — fixed` : '—';
 
-  document.getElementById('p_corpus').textContent  = fmt(corpusCost);
-  document.getElementById('p_maint').textContent   = fmt(maintCost);
-  document.getElementById('b_base').textContent    = fmt(baseCost);
-  document.getElementById('b_other').textContent   = fmt(otherCost);
-  document.getElementById('b_park').textContent    = fmt(parkCost);
+  document.getElementById('park_info').textContent = parkInfoText;
+  document.getElementById('park_info').className   = parkClass;
+  document.getElementById('p_corpus').textContent  = sf ? fmt(corpusCost) : '—';
+  document.getElementById('p_maint').textContent   = sf ? fmt(maintCost)  : '—';
+  document.getElementById('b_base').textContent    = sf ? fmt(baseCost)   : '—';
+  document.getElementById('b_other').textContent   = sf ? fmt(otherCost)  : '—';
+  document.getElementById('b_park').textContent    = ready ? fmt(parkTotal) : '—';
   document.getElementById('b_park_fm').textContent = parkFm;
-  document.getElementById('b_corpus').textContent  = fmt(corpusCost);
-  document.getElementById('b_maint').textContent   = fmt(maintCost);
-  document.getElementById('total').textContent     = fmt(total);
+  document.getElementById('b_corpus').textContent  = sf ? fmt(corpusCost) : '—';
+  document.getElementById('b_maint').textContent   = sf ? fmt(maintCost)  : '—';
+  document.getElementById('total').textContent     = ready ? fmt(total)   : '—';
 }
 calc();
 </script>
