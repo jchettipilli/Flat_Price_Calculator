@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flat Price Calculator</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 32px 16px; }
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.10); width: 100%; max-width: 580px; overflow: hidden; }
+  .header { background: #1F3864; color: #fff; padding: 22px 28px; }
+  .header h1 { font-size: 20px; font-weight: 700; }
+  .header p { font-size: 13px; color: #a8bcd4; margin-top: 4px; }
+  .body { padding: 24px 28px; }
+  .section-label { font-size: 10px; font-weight: 700; color: #1F3864; text-transform: uppercase; letter-spacing: 0.08em; background: #D6E4F0; padding: 5px 10px; border-radius: 4px; margin: 20px 0 10px; }
+  .section-label:first-child { margin-top: 0; }
+  .field { display: grid; grid-template-columns: 1fr 140px; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .field label { font-size: 13px; color: #444; }
+  .field input { width: 100%; padding: 7px 10px; font-size: 14px; border: 1.5px solid #cdd8e3; border-radius: 6px; color: #0000cc; font-weight: 600; background: #EBF5FB; outline: none; text-align: right; }
+  .field input:focus { border-color: #1F3864; }
+  .field-3 { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .field-3 label { font-size: 13px; color: #444; }
+  .field-3 .fixed { font-size: 12px; color: #888; white-space: nowrap; }
+  .preview { font-size: 13px; font-weight: 600; color: #1F3864; text-align: right; white-space: nowrap; }
+  .divider { border: none; border-top: 1px solid #e8ecf0; margin: 20px 0; }
+  .breakdown { border: 1px solid #e0e6ed; border-radius: 8px; overflow: hidden; margin-top: 4px; }
+  .brow { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 10px 14px; border-bottom: 1px solid #e8ecf0; }
+  .brow:last-child { border-bottom: none; }
+  .blabel { font-size: 13px; color: #444; }
+  .bfm { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .bval { font-size: 13px; font-weight: 600; color: #222; text-align: right; white-space: nowrap; }
+  .total-box { display: grid; grid-template-columns: 1fr auto; align-items: center; background: #1F3864; color: #fff; border-radius: 8px; padding: 16px 20px; margin-top: 10px; gap: 12px; }
+  .tlabel { font-size: 15px; font-weight: 700; }
+  .tval { font-size: 22px; font-weight: 700; text-align: right; white-space: nowrap; }
+  .cash-box { display: grid; grid-template-columns: 1fr auto; align-items: center; background: #FEF9E7; border: 1px solid #f5d76e; border-radius: 8px; padding: 13px 20px; margin-top: 8px; gap: 12px; }
+  .clabel { font-size: 13px; color: #7D6608; font-weight: 600; }
+  .csub { font-size: 11px; color: #b8a040; margin-top: 3px; }
+  .cval { font-size: 15px; font-weight: 700; color: #7D6608; text-align: right; white-space: nowrap; }
+  .note { font-size: 11px; color: #aaa; margin-top: 14px; line-height: 1.6; }
+  .badge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 99px; background: #e8f0fa; color: #1F3864; border: 1px solid #c5d5ea; margin-left: 5px; font-weight: 600; vertical-align: middle; }
+  .badge-cash { background: #fef3cd; color: #856404; border-color: #f5d76e; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <h1>Flat Price Calculator</h1>
+    <p>Edit the blue fields for each buyer</p>
+  </div>
+  <div class="body">
+
+    <div class="section-label">Flat Details</div>
+    <div class="field">
+      <label>Area (sqft)</label>
+      <input type="number" id="sqft" value="2336" min="0" oninput="calc()">
+    </div>
+
+    <div class="section-label">Price per sqft <span class="badge">varies per buyer</span></div>
+    <div class="field">
+      <label>Base price (₹/sqft)</label>
+      <input type="number" id="basePrice" value="5500" min="0" oninput="calc()">
+    </div>
+    <div class="field">
+      <label>Other price (₹/sqft)</label>
+      <input type="number" id="otherPrice" value="0" min="0" oninput="calc()">
+    </div>
+
+    <div class="section-label">Car Parking <span class="badge">fixed — 2 slots = ₹5,00,000</span></div>
+    <div class="field">
+      <label>Number of parkings</label>
+      <input type="number" id="parkings" value="2" min="0" max="10" oninput="calc()">
+    </div>
+
+    <div class="section-label">Corpus & Maintenance <span class="badge">based on sqft</span></div>
+    <div class="field-3">
+      <label>Corpus</label>
+      <span class="fixed">₹50/sqft + 18% GST</span>
+      <span class="preview" id="p_corpus"></span>
+    </div>
+    <div class="field-3">
+      <label>Maintenance</label>
+      <span class="fixed">₹2.5/sqft × 24 months</span>
+      <span class="preview" id="p_maint"></span>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Breakdown</div>
+    <div class="breakdown">
+      <div class="brow">
+        <div><div class="blabel">Base price</div><div class="bfm">base rate × sqft</div></div>
+        <span class="bval" id="b_base"></span>
+      </div>
+      <div class="brow">
+        <div><div class="blabel">Other price</div><div class="bfm">other rate × sqft</div></div>
+        <span class="bval" id="b_other"></span>
+      </div>
+      <div class="brow">
+        <div><div class="blabel">Car parking</div><div class="bfm" id="b_park_fm"></div></div>
+        <span class="bval" id="b_park"></span>
+      </div>
+      <div class="brow">
+        <div><div class="blabel">Corpus fund</div><div class="bfm">₹50 × sqft × 1.18</div></div>
+        <span class="bval" id="b_corpus"></span>
+      </div>
+      <div class="brow">
+        <div><div class="blabel">Advance maintenance</div><div class="bfm">₹2.5 × sqft × 24 months</div></div>
+        <span class="bval" id="b_maint"></span>
+      </div>
+    </div>
+
+    <div class="total-box">
+      <span class="tlabel">Total</span>
+      <span class="tval" id="total"></span>
+    </div>
+
+    <div class="cash-box">
+      <div>
+        <div class="clabel">Debris & other charges <span class="badge badge-cash">cash · at possession</span></div>
+        <div class="csub">Fixed — paid separately, not included in total above</div>
+      </div>
+      <span class="cval">₹51,000</span>
+    </div>
+
+    <p class="note">* Car parking: 2 slots = ₹5,00,000 fixed (₹2.5L per slot). Corpus GST @ 18% included. Debris & other charges ₹51,000 cash payable at possession.</p>
+  </div>
+</div>
+
+<script>
+function fmt(n) {
+  return '₹' + Math.round(n).toLocaleString('en-IN');
+}
+function calc() {
+  const bp = parseFloat(document.getElementById('basePrice').value) || 0;
+  const op = parseFloat(document.getElementById('otherPrice').value) || 0;
+  const sf = parseFloat(document.getElementById('sqft').value) || 0;
+  const pk = parseFloat(document.getElementById('parkings').value) || 0;
+
+  const baseCost   = Math.round(bp * sf);
+  const otherCost  = Math.round(op * sf);
+  const parkCost   = Math.round(pk * 250000);
+  const corpusCost = Math.round(50 * sf * 1.18);
+  const maintCost  = Math.round(2.5 * sf * 24);
+  const total      = baseCost + otherCost + parkCost + corpusCost + maintCost;
+
+  const parkFm = pk === 2 ? '2 slots = ₹5,00,000 (fixed)'
+               : pk === 1 ? '1 slot = ₹2,50,000'
+               : pk + ' slots × ₹2.5L each';
+
+  document.getElementById('p_corpus').textContent  = fmt(corpusCost);
+  document.getElementById('p_maint').textContent   = fmt(maintCost);
+  document.getElementById('b_base').textContent    = fmt(baseCost);
+  document.getElementById('b_other').textContent   = fmt(otherCost);
+  document.getElementById('b_park').textContent    = fmt(parkCost);
+  document.getElementById('b_park_fm').textContent = parkFm;
+  document.getElementById('b_corpus').textContent  = fmt(corpusCost);
+  document.getElementById('b_maint').textContent   = fmt(maintCost);
+  document.getElementById('total').textContent     = fmt(total);
+}
+calc();
+</script>
+</body>
+</html>
